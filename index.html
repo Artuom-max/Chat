@@ -19,7 +19,7 @@
       font-family: 'VT323', monospace; font-size: 18px;
       height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
     }
- 
+
     /* ── LOGIN ── */
     #login-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,.95);
@@ -47,7 +47,7 @@
       display: block;
     }
     .modal input:focus { border-color: var(--green); }
- 
+
     #pass-section {
       overflow: hidden;
       max-height: 0;
@@ -63,7 +63,7 @@
     #pass-label { color: var(--gold); font-size: 14px; margin-bottom: 6px; display: block; text-align: left; }
     #pass-err { color: var(--red); font-size: 14px; min-height: 20px; margin-bottom: 4px; }
     #login-err { color: var(--red); font-size: 14px; min-height: 20px; margin-bottom: 8px; }
- 
+
     .modal button {
       width: 100%; background: var(--green-dim); color: var(--green);
       border: 1px solid var(--green-mid); font-family: 'Press Start 2P', monospace;
@@ -71,7 +71,7 @@
       transition: background .15s, color .15s;
     }
     .modal button:hover { background: var(--green); color: #000; }
- 
+
     /* ── CONFIRM DIALOG ── */
     #confirm-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,.85);
@@ -94,7 +94,7 @@
     #confirm-yes:hover { background: var(--red); color: #000; }
     #confirm-no { background: var(--green-dim); color: var(--green); border-color: var(--green-mid); }
     #confirm-no:hover { background: var(--green); color: #000; }
- 
+
     /* ── CRASH OVERLAY ── */
     #crash-overlay {
       position: fixed; inset: 0; background: #0000aa;
@@ -117,7 +117,7 @@
     #crash-reload:hover { background: #fff; }
     .blink { animation: bl 1s step-start infinite; }
     @keyframes bl { 50% { opacity: 0; } }
- 
+
     /* ── HEADER ── */
     header {
       background: var(--header); border-bottom: 2px solid var(--green-dim);
@@ -130,10 +130,10 @@
     .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--red); transition: background .3s; }
     .dot.on { background: var(--green); box-shadow: 0 0 7px var(--green); }
     #status-text { color: var(--gray-lt); font-size: 14px; }
- 
+
     /* ── CHAT AREA ── */
     #chat-wrap { flex: 1; position: relative; overflow: hidden; }
- 
+
     #chat {
       position: absolute; inset: 0;
       overflow-y: auto; padding: 8px 14px;
@@ -143,7 +143,7 @@
     #chat::-webkit-scrollbar { width: 5px; }
     #chat::-webkit-scrollbar-track { background: var(--bg); }
     #chat::-webkit-scrollbar-thumb { background: var(--green-dim); }
- 
+
     /* ── BAD APPLE IN CHAT ── */
     #ba-wrap {
       position: absolute; inset: 0;
@@ -173,7 +173,7 @@
       cursor: pointer; transition: background .15s;
     }
     #ba-stop:hover { background: var(--red); color: #000; }
- 
+
     /* ── MESSAGE LINES ── */
     .line { line-height: 1.45; word-break: break-word; }
     .line .ts { color: var(--gray); font-size: 14px; }
@@ -191,7 +191,7 @@
     }
     .line.chat-name .name { color: #60a5fa; }
     .line.spam-warn { color: var(--red); font-weight: bold; }
- 
+
     /* ── INPUT ── */
     #input-row {
       border-top: 2px solid var(--border); background: var(--bg-input);
@@ -221,7 +221,7 @@
   </style>
 </head>
 <body>
- 
+
 <!-- LOGIN -->
 <div id="login-overlay">
   <div class="modal">
@@ -241,7 +241,7 @@
     <button id="join-btn">[ JOIN SERVER ]</button>
   </div>
 </div>
- 
+
 <!-- CONFIRM CRASHER -->
 <div id="confirm-overlay">
   <div class="confirm-box">
@@ -253,7 +253,7 @@
     </div>
   </div>
 </div>
- 
+
 <!-- CRASH BSOD -->
 <div id="crash-overlay">
   <h1>A fatal error has occurred</h1>
@@ -267,7 +267,7 @@
   <p class="blink" style="margin-top:26px;font-size:13px">Press any key to restart</p>
   <button id="crash-reload">RELOAD PAGE</button>
 </div>
- 
+
 <!-- HEADER -->
 <header>
   <div class="title">🟩 GLOBAL CHAT</div>
@@ -278,11 +278,11 @@
     </div>
   </div>
 </header>
- 
+
 <!-- MAIN CHAT AREA -->
 <div id="chat-wrap">
   <div id="chat"></div>
- 
+
   <!-- BAD APPLE PANEL (inside chat area) -->
   <div id="ba-wrap">
     <div id="ba-header">BAD APPLE !!</div>
@@ -297,16 +297,16 @@
     </div>
   </div>
 </div>
- 
+
 <!-- SPAM WARNING BAR -->
 <div id="spam-bar">⛔ SPAM DETECTED — Chat blocked for <span id="spam-countdown">30</span>s</div>
- 
+
 <!-- INPUT -->
 <div id="input-row">
   <input id="msg-input" type="text" placeholder="Type a message or /help..." maxlength="200" autocomplete="off" disabled>
   <button id="send-btn" disabled>SEND</button>
 </div>
- 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.5.0/mqtt.min.js"></script>
 <script>
 /* ═══════════ CONFIG ═══════════ */
@@ -317,16 +317,16 @@ const ADMIN_PASS  = "6821-C";
 const RESERVED    = ["CHAT", "SERVER", "SYSTEM"]; // names nobody can use
 const BA_URL      = "https://raw.githubusercontent.com/Artuom-max/Chat/main/ascii_video.txt";
 const BA_FPS      = 30;
- 
+
 /* ═══════════ STATE ═══════════ */
 let username = "", isAdmin = false, client = null, connected = false;
 let hist = [], histIdx = -1;
 let spamTimes = [], spamBlocked = false, spamTimer = null;
- 
+
 // Bad Apple
 let baFrames = [], baLoaded = false, baLoading = false;
 let baInterval = null, baCurFrame = 0, baStart = 0;
- 
+
 /* ═══════════ DOM ═══════════ */
 const $ = id => document.getElementById(id);
 const loginOverlay = $("login-overlay");
@@ -354,7 +354,7 @@ const dot          = $("dot");
 const statusText   = $("status-text");
 const spamBar      = $("spam-bar");
 const spamCountEl  = $("spam-countdown");
- 
+
 /* ═══════════ LOGIN ═══════════ */
 nameInput.addEventListener("input", () => {
   loginErr.textContent = "";
@@ -367,7 +367,7 @@ nameInput.addEventListener("input", () => {
     passInput.value = "";
   }
 });
- 
+
 nameInput.addEventListener("keydown", e => {
   if (e.key !== "Enter") return;
   if (nameInput.value.trim() === ADMIN_NAME) passInput.focus();
@@ -375,19 +375,19 @@ nameInput.addEventListener("keydown", e => {
 });
 passInput.addEventListener("keydown", e => { if (e.key === "Enter") joinServer(); });
 joinBtn.addEventListener("click", joinServer);
- 
+
 function joinServer() {
   const name = nameInput.value.trim();
   loginErr.textContent = "";
- 
+
   if (!name) { nameInput.focus(); return; }
- 
+
   // Block reserved names
   if (RESERVED.includes(name.toUpperCase())) {
     loginErr.textContent = 'Name "' + name + '" is reserved!';
     nameInput.value = ""; nameInput.focus(); return;
   }
- 
+
   if (name === ADMIN_NAME) {
     if (!passInput.value) { passInput.focus(); return; }
     if (passInput.value !== ADMIN_PASS) {
@@ -397,17 +397,17 @@ function joinServer() {
     }
     isAdmin = true;
   }
- 
+
   username = name;
   loginOverlay.classList.add("hidden");
   connect();
 }
- 
+
 /* ═══════════ MQTT ═══════════ */
 function connect() {
   appendSystem("Connecting to server...");
   client = mqtt.connect(BROKER, { reconnectPeriod: 4000 });
- 
+
   client.on("connect", () => {
     connected = true;
     dot.classList.add("on");
@@ -426,7 +426,7 @@ function connect() {
   });
   client.on("error", err => appendError("MQTT error: " + err.message));
 }
- 
+
 /* ═══════════ INCOMING ═══════════ */
 function handleIncoming(text) {
   if      (text.startsWith("__JOIN__"))    appendLine("join", "* " + text.slice(8) + " joined the server *");
@@ -459,16 +459,16 @@ function handleIncoming(text) {
     triggerCrash();
   }
 }
- 
+
 /* ═══════════ SEND + SPAM GUARD ═══════════ */
 function send() {
   const text = msgInput.value.trim();
   if (!text) return;
   msgInput.value = ""; hist.unshift(text); histIdx = -1;
- 
+
   if (text.startsWith("/")) { processCommand(text.slice(1)); return; }
   if (!connected) { appendError("Not connected."); return; }
- 
+
   // Anti-spam (skip for admin)
   if (!isAdmin) {
     const now = Date.now();
@@ -479,10 +479,10 @@ function send() {
       return;
     }
   }
- 
+
   client.publish(TOPIC, "__MSG__" + username + ":" + text);
 }
- 
+
 function blockSpam() {
   if (spamBlocked) return;
   spamBlocked = true;
@@ -504,20 +504,20 @@ function blockSpam() {
     }
   }, 1000);
 }
- 
+
 sendBtn.addEventListener("click", send);
 msgInput.addEventListener("keydown", e => {
   if (e.key === "Enter") { send(); return; }
   if (e.key === "ArrowUp")   { histIdx = Math.min(histIdx+1, hist.length-1); msgInput.value = hist[histIdx]||""; }
   if (e.key === "ArrowDown") { histIdx = Math.max(histIdx-1,-1); msgInput.value = histIdx<0?"":hist[histIdx]; }
 });
- 
+
 /* ═══════════ COMMANDS ═══════════ */
 function processCommand(raw) {
   const parts = raw.trim().split(/\s+/);
   const cmd = parts[0].toLowerCase();
   const args = parts.slice(1);
- 
+
   switch (cmd) {
     case "help":
       appendLine("help", "+-----------------------------------------+");
@@ -531,49 +531,49 @@ function processCommand(raw) {
       appendLine("help", "| /announce <text>    broadcast  [ADMIN]  |");
       appendLine("help", "+-----------------------------------------+");
       break;
- 
+
     case "quit": case "exit":
       if (client) client.publish(TOPIC, "__LEAVE__" + username);
       setTimeout(() => { if (client) client.disconnect(); window.location.reload(); }, 400);
       break;
- 
+
     case "kick":
       if (!isAdmin) { appendError("Permission denied — admin only."); return; }
       if (!args[0]) { appendError("Usage: /kick <player>"); return; }
       client.publish(TOPIC, "__KICK__" + args[0]);
       appendLine("admin", "Kicked: " + args[0]);
       break;
- 
+
     case "badapple":
       if (!isAdmin) { appendError("Permission denied — admin only."); return; }
       client.publish(TOPIC, "__BADAPPLE__");
       break;
- 
+
     case "crasher":
       if (!isAdmin) { appendError("Permission denied — admin only."); return; }
       confirmOvr.classList.add("visible");
       break;
- 
+
     case "announce":
       if (!isAdmin) { appendError("Permission denied — admin only."); return; }
       const msg = args.join(" ").trim();
       if (!msg) { appendError("Usage: /announce <text>"); return; }
       client.publish(TOPIC, "__ANNOUNCE__" + msg);
       break;
- 
+
     default:
       appendError("Unknown command: /" + raw.trim());
       appendLine("system", "Type /help to see available commands.");
   }
 }
- 
+
 /* ═══════════ CONFIRM CRASHER ═══════════ */
 confirmYes.addEventListener("click", () => {
   confirmOvr.classList.remove("visible");
   client.publish(TOPIC, "__CRASH__");
 });
 confirmNo.addEventListener("click", () => confirmOvr.classList.remove("visible"));
- 
+
 /* ═══════════ BAD APPLE ═══════════ */
 function parseTxtFrames(text) {
   const frames = [];
@@ -584,14 +584,14 @@ function parseTxtFrames(text) {
   }
   return frames;
 }
- 
+
 async function loadBaFrames() {
   if (baLoaded || baLoading) return;
   baLoading = true;
   baLoading_el_show(true);
   baProgFill.style.width = "0%";
   baPre.textContent = "";
- 
+
   try {
     const resp = await fetch(BA_URL);
     if (!resp.ok) throw new Error("HTTP " + resp.status);
@@ -599,7 +599,7 @@ async function loadBaFrames() {
     const reader = resp.body.getReader();
     const decoder = new TextDecoder();
     let received = 0, chunks = "";
- 
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -607,7 +607,7 @@ async function loadBaFrames() {
       chunks += decoder.decode(value, { stream: true });
       if (total > 0) baProgFill.style.width = Math.min(99, Math.round(received / total * 100)) + "%";
     }
- 
+
     baFrames = parseTxtFrames(chunks);
     baLoaded = true;
     baProgFill.style.width = "100%";
@@ -621,23 +621,23 @@ async function loadBaFrames() {
   }
   baLoading = false;
 }
- 
+
 function baLoading_el_show(on) {
   baLoading.style.display = on ? "block" : "none";
 }
- 
+
 async function startBadApple() {
   baWrap.classList.add("visible");
   if (!baLoaded) await loadBaFrames();
   if (!baFrames.length) { baLoadText.textContent = "No frames found!"; return; }
- 
+
   baCurFrame = 0; baStart = Date.now();
   clearInterval(baInterval);
- 
+
   // Notify chat
   const ts = new Date().toTimeString().slice(0, 5);
   appendMsg(ts, "CHAT", "▶ Bad Apple is now playing! [30 FPS]", false, true);
- 
+
   baInterval = setInterval(() => {
     if (!baFrames.length) return;
     baPre.textContent = baFrames[baCurFrame % baFrames.length];
@@ -646,14 +646,14 @@ async function startBadApple() {
     baTimer.textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
   }, 1000 / BA_FPS);
 }
- 
+
 baStop.addEventListener("click", () => {
   clearInterval(baInterval); baInterval = null;
   baWrap.classList.remove("visible");
   const ts = new Date().toTimeString().slice(0, 5);
   appendMsg(ts, "CHAT", "⏹ Bad Apple stopped.", false, true);
 });
- 
+
 /* ═══════════ CRASH ═══════════ */
 function triggerCrash() {
   playCrashSound();
@@ -686,7 +686,7 @@ function playCrashSound() {
 }
 $("crash-reload").addEventListener("click", () => window.location.reload());
 window.addEventListener("keydown", () => { if (crashOverlay.classList.contains("visible")) window.location.reload(); });
- 
+
 /* ═══════════ RENDER ═══════════ */
 function appendMsg(ts, name, body, self, isChat) {
   const d = document.createElement("div");
@@ -709,7 +709,7 @@ function push(el) { chatEl.appendChild(el); chatEl.scrollTop = chatEl.scrollHeig
 function esc(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
- 
+
 window.addEventListener("beforeunload", () => {
   try { if (client && username) client.publish(TOPIC, "__LEAVE__" + username); } catch (_) {}
 });
