@@ -105,6 +105,11 @@
     #crash-reload:hover { background: #fff; }
     .blink { animation: bl 1s step-start infinite; }
     @keyframes bl { 50% { opacity: 0; } }
+    @keyframes no-fade {
+      0%   { opacity: 1; transform: translate(-50%,-50%) scale(1.2); }
+      60%  { opacity: 1; transform: translate(-50%,-80%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%,-110%) scale(.9); }
+    }
 
     /* ── HEADER ── */
     header {
@@ -214,7 +219,7 @@
 <div id="login-screen" class="screen hidden">
   <div class="card">
     <div class="grass-row"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-    <h2>MINECRAFT<br>GLOBAL CHAT</h2>
+    <h2>GLOBAL CHAT</h2>
     <p class="sub">Sign in to join the server</p>
     <label>Email</label>
     <input id="login-email" type="email" placeholder="you@email.com" autocomplete="off">
@@ -907,6 +912,23 @@ function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>
 window.addEventListener("beforeunload", ()=>{
   try { if(mqttClient&&username) mqttClient.publish(TOPIC,"__LEAVE__"+username); } catch(_){}
   removePresence();
+});
+
+/* ═══ RIGHT CLICK "no" ═══ */
+document.addEventListener("contextmenu", e => {
+  e.preventDefault();
+  const el = document.createElement("div");
+  el.textContent = "no";
+  el.style.cssText = `
+    position:fixed; left:${e.clientX}px; top:${e.clientY}px;
+    font-family:'Press Start 2P',monospace; font-size:11px;
+    color:#4ade80; pointer-events:none; z-index:9999;
+    text-shadow:0 0 8px #4ade80;
+    transform:translate(-50%,-50%);
+    animation:no-fade 1s forwards;
+  `;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.5.0/mqtt.min.js"></script>
