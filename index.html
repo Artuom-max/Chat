@@ -11,6 +11,7 @@
       --bg: #0a0a0a; --bg-input: #141414;
       --green: #4ade80; --green-dim: #14532d; --green-mid: #16a34a;
       --gold: #fbbf24; --red: #f87171; --red-dark: #7f1d1d;
+      --blue: #60a5fa; --blue-dark: #1e3a5f;
       --gray: #374151; --gray-lt: #6b7280; --white: #e5e7eb;
       --border: #1f2937; --header: #052e16;
     }
@@ -20,77 +21,76 @@
       height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
     }
 
-    /* ── LOGIN ── */
-    #login-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.95);
+    /* ── AUTH SCREENS ── */
+    .screen {
+      position: fixed; inset: 0; background: rgba(0,0,0,.96);
       display: flex; align-items: center; justify-content: center;
       z-index: 200; backdrop-filter: blur(6px);
     }
-    #login-overlay.hidden { display: none; }
-    .modal {
+    .screen.hidden { display: none; }
+    .card {
       background: #071a07; border: 2px solid var(--green-dim);
-      padding: 38px 34px; width: min(420px, 94vw); text-align: center;
+      padding: 36px 32px; width: min(440px, 94vw); text-align: center;
     }
     .grass-row { display: flex; justify-content: center; gap: 3px; margin-bottom: 14px; }
-    .grass-row span { display: inline-block; width: 13px; height: 13px; background: var(--green); }
+    .grass-row span { display: inline-block; width: 12px; height: 12px; background: var(--green); }
     .grass-row span:nth-child(even) { background: var(--green-mid); }
-    .modal h2 {
-      font-family: 'Press Start 2P', monospace; font-size: 11px;
-      line-height: 1.8; color: var(--green); margin-bottom: 8px;
+    .card h2 {
+      font-family: 'Press Start 2P', monospace; font-size: 10px;
+      line-height: 1.8; color: var(--green); margin-bottom: 6px;
     }
-    .modal .sub { color: var(--gray-lt); font-size: 15px; margin-bottom: 22px; }
-    .modal input {
+    .card .sub { color: var(--gray-lt); font-size: 14px; margin-bottom: 20px; }
+    .card label { display: block; text-align: left; color: var(--gray-lt); font-size: 14px; margin-bottom: 4px; }
+    .card input {
       width: 100%; background: #000; border: 1px solid var(--green-dim);
-      color: var(--white); font-family: 'VT323', monospace; font-size: 22px;
-      padding: 10px 14px; outline: none; text-align: center;
-      letter-spacing: 2px; margin-bottom: 10px; transition: border-color .2s;
-      display: block;
+      color: var(--white); font-family: 'VT323', monospace; font-size: 20px;
+      padding: 8px 12px; outline: none; margin-bottom: 12px;
+      transition: border-color .2s; display: block;
     }
-    .modal input:focus { border-color: var(--green); }
-
-    #pass-section {
-      display: none;
-      margin-bottom: 6px;
-    }
-    #pass-section.show {
-      display: block;
-    }
-    #pass-label { color: var(--gold); font-size: 14px; margin-bottom: 6px; display: block; text-align: left; }
-    #pass-err { color: var(--red); font-size: 14px; min-height: 20px; margin-bottom: 4px; }
-    #login-err { color: var(--red); font-size: 14px; min-height: 20px; margin-bottom: 8px; }
-
-    .modal button {
+    .card input:focus { border-color: var(--green); }
+    .err-msg { color: var(--red); font-size: 14px; min-height: 20px; margin-bottom: 8px; }
+    .ok-msg  { color: var(--green); font-size: 14px; min-height: 20px; margin-bottom: 8px; }
+    .btn {
       width: 100%; background: var(--green-dim); color: var(--green);
       border: 1px solid var(--green-mid); font-family: 'Press Start 2P', monospace;
-      font-size: 9px; padding: 13px; cursor: pointer; letter-spacing: 1px;
-      transition: background .15s, color .15s;
+      font-size: 8px; padding: 12px; cursor: pointer; letter-spacing: 1px;
+      transition: background .15s, color .15s; margin-bottom: 8px; display: block;
     }
-    .modal button:hover { background: var(--green); color: #000; }
+    .btn:hover:not(:disabled) { background: var(--green); color: #000; }
+    .btn:disabled { opacity: .4; cursor: default; }
+    .btn.secondary {
+      background: transparent; color: var(--gray-lt);
+      border-color: var(--border); font-size: 7px;
+    }
+    .btn.secondary:hover { background: var(--border); color: var(--white); }
+    .btn.red-btn { background: var(--red-dark); color: var(--red); border-color: var(--red); }
+    .btn.red-btn:hover { background: var(--red); color: #000; }
+    .divider { color: var(--gray); font-size: 14px; margin: 8px 0; }
 
-    /* ── CONFIRM DIALOG ── */
+    /* ── BAN SCREEN ── */
+    #ban-screen .card { background: #1a0000; border-color: var(--red); }
+    #ban-screen h2 { color: var(--red); }
+    #ban-screen .ban-reason { color: var(--gray-lt); font-size: 15px; margin: 10px 0 20px; }
+
+    /* ── CONFIRM ── */
     #confirm-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,.85);
-      display: none; align-items: center; justify-content: center;
-      z-index: 400; backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; z-index: 400;
     }
     #confirm-overlay.visible { display: flex; }
     .confirm-box {
       background: #1a0000; border: 2px solid var(--red);
-      padding: 30px 28px; width: min(380px, 90vw); text-align: center;
+      padding: 28px; width: min(360px, 90vw); text-align: center;
     }
     .confirm-box h3 {
-      font-family: 'Press Start 2P', monospace; font-size: 10px;
-      color: var(--red); margin-bottom: 14px; line-height: 1.7;
+      font-family: 'Press Start 2P', monospace; font-size: 9px;
+      color: var(--red); margin-bottom: 12px; line-height: 1.7;
     }
-    .confirm-box p { color: var(--gray-lt); font-size: 15px; margin-bottom: 22px; }
+    .confirm-box p { color: var(--gray-lt); font-size: 15px; margin-bottom: 20px; }
     .confirm-btns { display: flex; gap: 10px; }
-    .confirm-btns button { flex: 1; }
-    #confirm-yes { background: var(--red-dark); color: var(--red); border-color: var(--red); }
-    #confirm-yes:hover { background: var(--red); color: #000; }
-    #confirm-no { background: var(--green-dim); color: var(--green); border-color: var(--green-mid); }
-    #confirm-no:hover { background: var(--green); color: #000; }
+    .confirm-btns .btn { margin-bottom: 0; }
 
-    /* ── CRASH OVERLAY ── */
+    /* ── CRASH ── */
     #crash-overlay {
       position: fixed; inset: 0; background: #0000aa;
       display: none; flex-direction: column; align-items: center; justify-content: center;
@@ -98,17 +98,10 @@
       font-family: 'Courier New', monospace;
     }
     #crash-overlay.visible { display: flex; }
-    #crash-overlay h1 {
-      background: #aaaaaa; color: #0000aa; font-size: 22px;
-      padding: 2px 10px; margin-bottom: 30px; font-weight: bold;
-    }
-    #crash-overlay p { color: #aaaaaa; font-size: 16px; line-height: 2.2; }
-    .crash-code { color: #fff !important; font-size: 18px !important; margin: 18px 0; }
-    #crash-reload {
-      margin-top: 28px; background: #aaaaaa; color: #0000aa;
-      border: none; font-family: 'Courier New', monospace; font-size: 14px;
-      padding: 8px 24px; cursor: pointer; font-weight: bold;
-    }
+    #crash-overlay h1 { background: #aaa; color: #0000aa; font-size: 20px; padding: 2px 10px; margin-bottom: 28px; }
+    #crash-overlay p { color: #aaa; font-size: 15px; line-height: 2.2; }
+    .crash-code { color: #fff !important; font-size: 17px !important; margin: 16px 0; }
+    #crash-reload { margin-top: 26px; background: #aaa; color: #0000aa; border: none; font-family: 'Courier New', monospace; font-size: 13px; padding: 8px 22px; cursor: pointer; font-weight: bold; }
     #crash-reload:hover { background: #fff; }
     .blink { animation: bl 1s step-start infinite; }
     @keyframes bl { 50% { opacity: 0; } }
@@ -116,157 +109,165 @@
     /* ── HEADER ── */
     header {
       background: var(--header); border-bottom: 2px solid var(--green-dim);
-      padding: 9px 18px; display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; display: flex; align-items: center; justify-content: space-between;
       flex-shrink: 0;
     }
-    .title { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--green); }
-    .hdr-right { display: flex; align-items: center; gap: 14px; }
-    .status { display: flex; align-items: center; gap: 7px; }
-    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--red); transition: background .3s; }
-    .dot.on { background: var(--green); box-shadow: 0 0 7px var(--green); }
-    #status-text { color: var(--gray-lt); font-size: 14px; }
+    .title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--green); }
+    .hdr-right { display: flex; align-items: center; gap: 12px; }
+    .user-badge { color: var(--gold); font-size: 14px; }
+    .status { display: flex; align-items: center; gap: 6px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); transition: background .3s; }
+    .dot.on { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    #status-text { color: var(--gray-lt); font-size: 13px; }
 
-    /* ── CHAT AREA ── */
+    /* ── CHAT ── */
     #chat-wrap { flex: 1; position: relative; overflow: hidden; }
-
     #chat {
-      position: absolute; inset: 0;
-      overflow-y: auto; padding: 8px 14px;
-      display: flex; flex-direction: column; gap: 1px;
-      transition: opacity .2s;
+      position: absolute; inset: 0; overflow-y: auto;
+      padding: 8px 14px; display: flex; flex-direction: column; gap: 1px;
     }
-    #chat::-webkit-scrollbar { width: 5px; }
-    #chat::-webkit-scrollbar-track { background: var(--bg); }
+    #chat::-webkit-scrollbar { width: 4px; }
     #chat::-webkit-scrollbar-thumb { background: var(--green-dim); }
 
-    /* ── BAD APPLE IN CHAT ── */
+    /* ── BAD APPLE ── */
     #ba-wrap {
-      position: absolute; inset: 0;
-      background: #000; display: none;
-      flex-direction: column; align-items: center; justify-content: center;
+      position: absolute; inset: 0; background: #000;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
     }
     #ba-wrap.visible { display: flex; }
-    #ba-header {
-      font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--green);
-      padding: 6px; letter-spacing: 3px; text-shadow: 0 0 14px var(--green); flex-shrink: 0;
-    }
-    #ba-loading {
-      color: var(--gold); font-size: 16px; text-align: center; padding: 10px;
-    }
-    #ba-prog-track { width: min(400px,80vw); background: #1a1a1a; height: 6px; margin-top: 6px; }
+    #ba-header { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--green); padding: 6px; letter-spacing: 3px; text-shadow: 0 0 12px var(--green); flex-shrink: 0; }
+    #ba-loading { color: var(--gold); font-size: 15px; text-align: center; padding: 8px; }
+    #ba-prog-track { width: min(380px,80vw); background: #1a1a1a; height: 5px; margin-top: 5px; }
     #ba-prog-fill { background: var(--green); height: 100%; width: 0; transition: width .1s; }
-    #ba-pre {
-      font-family: 'Courier New', 'Lucida Console', monospace;
-      font-size: 8.5px; line-height: 1.05; color: #fff; white-space: pre;
-      flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden;
-    }
-    #ba-footer { padding: 6px; display: flex; gap: 14px; align-items: center; flex-shrink: 0; }
-    #ba-timer { color: var(--gray-lt); font-size: 15px; }
-    #ba-stop {
-      background: var(--red-dark); color: var(--red); border: 1px solid var(--red);
-      font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 6px 14px;
-      cursor: pointer; transition: background .15s;
-    }
+    #ba-pre { font-family: 'Courier New', monospace; font-size: 8px; line-height: 1.05; color: #fff; white-space: pre; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    #ba-footer { padding: 6px; display: flex; gap: 12px; align-items: center; flex-shrink: 0; }
+    #ba-timer { color: var(--gray-lt); font-size: 14px; }
+    #ba-stop { background: var(--red-dark); color: var(--red); border: 1px solid var(--red); font-family: 'Press Start 2P', monospace; font-size: 7px; padding: 6px 12px; cursor: pointer; }
     #ba-stop:hover { background: var(--red); color: #000; }
 
-    /* ── MESSAGE LINES ── */
+    /* ── LINES ── */
     .line { line-height: 1.45; word-break: break-word; }
-    .line .ts { color: var(--gray); font-size: 14px; }
+    .line .ts { color: var(--gray); font-size: 13px; }
     .line .name { color: var(--green); font-weight: bold; }
     .line .body { color: var(--white); }
     .line.self .name { color: var(--gold); }
-    .line.system { color: var(--gray-lt); font-size: 15px; font-style: italic; }
-    .line.join { color: var(--green-dim); font-size: 15px; font-style: italic; }
+    .line.system { color: var(--gray-lt); font-size: 14px; font-style: italic; }
+    .line.join { color: var(--green-dim); font-size: 14px; font-style: italic; }
     .line.error { color: var(--red); }
-    .line.help { color: var(--green); font-size: 15px; font-family: 'Courier New', monospace; }
+    .line.help { color: var(--green); font-size: 14px; font-family: 'Courier New', monospace; }
     .line.admin { color: var(--gold); }
-    .line.announce {
-      color: #000; background: var(--gold); padding: 2px 8px;
-      font-weight: bold; border-left: 4px solid #b45309;
-    }
-    .line.chat-name .name { color: #60a5fa; }
-    .line.spam-warn { color: var(--red); font-weight: bold; }
+    .line.announce { color: #000; background: var(--gold); padding: 2px 8px; border-left: 4px solid #b45309; }
+    .line.chat-msg .name { color: var(--blue); }
 
     /* ── INPUT ── */
     #input-row {
       border-top: 2px solid var(--border); background: var(--bg-input);
-      padding: 9px 14px; display: flex; gap: 8px; flex-shrink: 0;
+      padding: 8px 14px; display: flex; gap: 8px; flex-shrink: 0;
     }
     #msg-input {
       flex: 1; background: var(--bg); border: 1px solid var(--border);
       color: var(--white); font-family: 'VT323', monospace; font-size: 18px;
-      padding: 7px 12px; outline: none; transition: border-color .2s;
+      padding: 6px 10px; outline: none; transition: border-color .2s;
     }
     #msg-input:focus { border-color: var(--green); }
     #msg-input::placeholder { color: var(--gray); }
     #msg-input:disabled { opacity: .4; }
     #send-btn {
       background: var(--green-dim); color: var(--green); border: 1px solid var(--green-mid);
-      font-family: 'Press Start 2P', monospace; font-size: 8px;
-      padding: 7px 14px; cursor: pointer; transition: background .15s, color .15s;
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      padding: 6px 12px; cursor: pointer; transition: background .15s;
     }
     #send-btn:hover:not(:disabled) { background: var(--green); color: #000; }
     #send-btn:disabled { opacity: .4; cursor: default; }
     #spam-bar {
       background: var(--red-dark); color: var(--red);
-      font-family: 'Press Start 2P', monospace; font-size: 8px;
-      padding: 6px 14px; text-align: center; display: none; flex-shrink: 0;
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      padding: 5px 14px; text-align: center; display: none; flex-shrink: 0;
     }
     #spam-bar.visible { display: block; }
   </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-overlay">
-  <div class="modal">
-    <div class="grass-row">
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-    </div>
-    <h2>MINECRAFT<br>GLOBAL CHAT</h2>
-    <p class="sub">Enter your player name to join</p>
-    <input id="name-input" type="text" maxlength="20" placeholder="Steve" autocomplete="off">
-    <div id="pass-section">
-      <span id="pass-label">Admin detected — enter password:</span>
-      <input id="pass-input" type="password" placeholder="password" autocomplete="off">
-      <div id="pass-err"></div>
-    </div>
-    <div id="login-err"></div>
-    <button id="join-btn">[ JOIN SERVER ]</button>
+<!-- ── REGISTER ── -->
+<div id="register-screen" class="screen">
+  <div class="card">
+    <div class="grass-row"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <h2>CREATE ACCOUNT</h2>
+    <p class="sub">Register to join the server</p>
+    <label>Username (shown in chat)</label>
+    <input id="reg-name" type="text" maxlength="20" placeholder="Steve" autocomplete="off">
+    <label>Email</label>
+    <input id="reg-email" type="email" placeholder="you@email.com" autocomplete="off">
+    <label>Password</label>
+    <input id="reg-pass" type="password" placeholder="min 6 characters" autocomplete="new-password">
+    <div class="err-msg" id="reg-err"></div>
+    <button class="btn" id="reg-btn">[ CREATE ACCOUNT ]</button>
+    <div class="divider">— already have account? —</div>
+    <button class="btn secondary" id="go-login-btn">[ SIGN IN ]</button>
   </div>
 </div>
 
-<!-- CONFIRM CRASHER -->
+<!-- ── LOGIN ── -->
+<div id="login-screen" class="screen hidden">
+  <div class="card">
+    <div class="grass-row"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <h2>MINECRAFT<br>GLOBAL CHAT</h2>
+    <p class="sub">Sign in to join the server</p>
+    <label>Email</label>
+    <input id="login-email" type="email" placeholder="you@email.com" autocomplete="off">
+    <label>Password</label>
+    <input id="login-pass" type="password" placeholder="password" autocomplete="current-password">
+    <div class="err-msg" id="login-err"></div>
+    <button class="btn" id="login-btn">[ SIGN IN ]</button>
+    <div class="divider">— no account? —</div>
+    <button class="btn secondary" id="go-reg-btn">[ CREATE ACCOUNT ]</button>
+    <div class="divider"></div>
+    <button class="btn secondary" id="forgot-btn">[ FORGOT PASSWORD ]</button>
+    <div class="ok-msg" id="login-ok"></div>
+  </div>
+</div>
+
+<!-- ── BAN ── -->
+<div id="ban-screen" class="screen hidden">
+  <div class="card">
+    <div class="grass-row"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <h2>⛔ YOU ARE BANNED</h2>
+    <p class="ban-reason" id="ban-reason-text">You have been banned from this server.</p>
+    <p style="color:var(--gray-lt);font-size:13px">Banned by: <span id="ban-by" style="color:var(--red)"></span></p>
+    <br>
+    <p style="color:var(--gray);font-size:13px">Contact the admin to appeal.</p>
+  </div>
+</div>
+
+<!-- ── CONFIRM ── -->
 <div id="confirm-overlay">
   <div class="confirm-box">
     <h3>⚠ CONFIRM CRASH</h3>
-    <p>This will crash the server for ALL connected players.<br>Are you sure?</p>
+    <p>This crashes the server for ALL players. Sure?</p>
     <div class="confirm-btns">
-      <button id="confirm-yes">[ CRASH ]</button>
-      <button id="confirm-no">[ CANCEL ]</button>
+      <button class="btn red-btn" id="confirm-yes">[ CRASH ]</button>
+      <button class="btn" id="confirm-no">[ CANCEL ]</button>
     </div>
   </div>
 </div>
 
-<!-- CRASH BSOD -->
+<!-- ── CRASH BSOD ── -->
 <div id="crash-overlay">
   <h1>A fatal error has occurred</h1>
   <p>The server has been terminated.</p>
   <p class="crash-code">CRITICAL_PROCESS_DIED</p>
   <p>Crashed by: <strong style="color:#fff">Artuom-Dev</strong></p>
-  <p style="margin-top:18px;font-size:13px;color:#777">
-    Error code: 0xDEADBEEF — FATAL_CHAT_EXCEPTION<br>
-    MQTT broker forcibly disconnected
-  </p>
-  <p class="blink" style="margin-top:26px;font-size:13px">Press any key to restart</p>
+  <p style="margin-top:16px;font-size:12px;color:#666">Error code: 0xDEADBEEF — FATAL_CHAT_EXCEPTION</p>
+  <p class="blink" style="margin-top:24px;font-size:12px">Press any key to restart</p>
   <button id="crash-reload">RELOAD PAGE</button>
 </div>
 
-<!-- HEADER -->
+<!-- ── MAIN UI ── -->
 <header>
   <div class="title">🟩 GLOBAL CHAT</div>
   <div class="hdr-right">
+    <span class="user-badge" id="user-badge"></span>
     <div class="status">
       <div class="dot" id="dot"></div>
       <span id="status-text">Disconnected</span>
@@ -274,11 +275,8 @@
   </div>
 </header>
 
-<!-- MAIN CHAT AREA -->
 <div id="chat-wrap">
   <div id="chat"></div>
-
-  <!-- BAD APPLE PANEL (inside chat area) -->
   <div id="ba-wrap">
     <div id="ba-header">BAD APPLE !!</div>
     <div id="ba-loading">
@@ -293,53 +291,61 @@
   </div>
 </div>
 
-<!-- SPAM WARNING BAR -->
-<div id="spam-bar">⛔ SPAM DETECTED — Chat blocked for <span id="spam-countdown">30</span>s</div>
-
-<!-- INPUT -->
+<div id="spam-bar">SPAM DETECTED — blocked for <span id="spam-cd">30</span>s</div>
 <div id="input-row">
   <input id="msg-input" type="text" placeholder="Type a message or /help..." maxlength="200" autocomplete="off" disabled>
   <button id="send-btn" disabled>SEND</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.5.0/mqtt.min.js"></script>
-<script>
-/* ═══════════ CONFIG ═══════════ */
-const BROKER      = "wss://broker.hivemq.com:8884/mqtt";
-const TOPIC       = "py_global_chat_v1";
-const ADMIN_NAME  = "Artuom-Dev";
-const ADMIN_PASS  = "6821-C";
-const RESERVED    = ["CHAT", "SERVER", "SYSTEM"]; // names nobody can use
-const BA_URL      = "https://raw.githubusercontent.com/Artuom-max/Chat/main/ascii_video.txt";
-const BA_FPS      = 30;
+<!-- Firebase -->
+<script type="module">
+import { initializeApp }                         from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword,
+         signInWithEmailAndPassword, onAuthStateChanged,
+         sendPasswordResetEmail, signOut }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc,
+         onSnapshot }                             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* ═══════════ STATE ═══════════ */
-let username = "", isAdmin = false, client = null, connected = false;
+/* ═══ FIREBASE INIT ═══ */
+const app = initializeApp({
+  apiKey:            "AIzaSyDWnH6IUsfF0aVNvrFaC7CS7DtIkk3QxiY",
+  authDomain:        "global-chat-1972d.firebaseapp.com",
+  projectId:         "global-chat-1972d",
+  storageBucket:     "global-chat-1972d.firebasestorage.app",
+  messagingSenderId: "248841111295",
+  appId:             "1:248841111295:web:3b93cc87b36470062a6eca"
+});
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+/* ═══ CONFIG ═══ */
+const BROKER     = "wss://broker.hivemq.com:8884/mqtt";
+const TOPIC      = "py_global_chat_v1";
+const ADMIN_UID_KEY = "artuom-dev-admin";
+const RESERVED   = ["CHAT","SERVER","SYSTEM"];
+const BA_URL     = "https://raw.githubusercontent.com/Artuom-max/Chat/main/ascii_video.txt";
+const BA_FPS     = 30;
+
+/* ═══ STATE ═══ */
+let currentUser = null, username = "", isAdmin = false;
+let mqttClient = null, connected = false;
 let hist = [], histIdx = -1;
 let spamTimes = [], spamBlocked = false, spamTimer = null;
-
-// Bad Apple
-let baFrames = [], baLoaded = false, baLoading = false;
+let baFrames = [], baLoaded = false, baIsLoading = false;
 let baInterval = null, baCurFrame = 0, baStart = 0;
 
-/* ═══════════ DOM ═══════════ */
+/* ═══ DOM ═══ */
 const $ = id => document.getElementById(id);
-const loginOverlay = $("login-overlay");
-const nameInput    = $("name-input");
-const passSection  = $("pass-section");
-const passInput    = $("pass-input");
-const passErr      = $("pass-err");
-const loginErr     = $("login-err");
-const joinBtn      = $("join-btn");
+const regScreen    = $("register-screen");
+const loginScreen  = $("login-screen");
+const banScreen    = $("ban-screen");
 const confirmOvr   = $("confirm-overlay");
-const confirmYes   = $("confirm-yes");
-const confirmNo    = $("confirm-no");
 const crashOverlay = $("crash-overlay");
 const chatEl       = $("chat");
 const baWrap       = $("ba-wrap");
 const baLoadText   = $("ba-load-text");
 const baProgFill   = $("ba-prog-fill");
-const baLoading    = $("ba-loading");
+const baLoadingEl  = $("ba-loading");
 const baPre        = $("ba-pre");
 const baTimer      = $("ba-timer");
 const baStop       = $("ba-stop");
@@ -347,155 +353,221 @@ const msgInput     = $("msg-input");
 const sendBtn      = $("send-btn");
 const dot          = $("dot");
 const statusText   = $("status-text");
+const userBadge    = $("user-badge");
 const spamBar      = $("spam-bar");
-const spamCountEl  = $("spam-countdown");
+const spamCd       = $("spam-cd");
 
-/* ═══════════ LOGIN ═══════════ */
-nameInput.addEventListener("input", () => {
-  loginErr.textContent = "";
-  const isAdmin = nameInput.value.trim() === ADMIN_NAME;
-  if (isAdmin) {
-    passSection.classList.add("show");
-  } else {
-    passSection.classList.remove("show");
-    passErr.textContent = "";
-    passInput.value = "";
-  }
-});
-
-nameInput.addEventListener("keydown", e => {
-  if (e.key !== "Enter") return;
-  if (nameInput.value.trim() === ADMIN_NAME) passInput.focus();
-  else joinServer();
-});
-passInput.addEventListener("keydown", e => { if (e.key === "Enter") joinServer(); });
-joinBtn.addEventListener("click", joinServer);
-
-function joinServer() {
-  const name = nameInput.value.trim();
-  loginErr.textContent = "";
-
-  if (!name) { nameInput.focus(); return; }
-
-  // Block reserved names
-  if (RESERVED.includes(name.toUpperCase())) {
-    loginErr.textContent = 'Name "' + name + '" is reserved!';
-    nameInput.value = ""; nameInput.focus(); return;
-  }
-
-  if (name === ADMIN_NAME) {
-    if (!passInput.value) { passInput.focus(); return; }
-    if (passInput.value !== ADMIN_PASS) {
-      passErr.textContent = "Wrong password!";
-      passInput.style.borderColor = "var(--red)";
-      passInput.value = ""; passInput.focus(); return;
+/* ═══ AUTH STATE ═══ */
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    currentUser = user;
+    // Load user profile from Firestore
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (!snap.exists()) {
+      // Profile missing — sign out
+      await signOut(auth);
+      showScreen("register");
+      return;
     }
-    isAdmin = true;
-  }
+    const data = snap.data();
+    username = data.username;
+    isAdmin  = data.isAdmin === true;
 
-  username = name;
-  loginOverlay.classList.add("hidden");
-  connect();
+    // Check ban
+    if (data.banned) {
+      $("ban-reason-text").textContent = data.banReason || "You have been banned.";
+      $("ban-by").textContent = data.bannedBy || "Admin";
+      showScreen("ban");
+      return;
+    }
+
+    showScreen("chat");
+    userBadge.textContent = username + (isAdmin ? " [ADMIN]" : "");
+    initMQTT();
+
+    // Watch for ban in real-time
+    onSnapshot(doc(db, "users", user.uid), snap2 => {
+      if (snap2.exists() && snap2.data().banned && !banScreen.classList.contains("hidden")) {
+        $("ban-reason-text").textContent = snap2.data().banReason || "You have been banned.";
+        $("ban-by").textContent = snap2.data().bannedBy || "Admin";
+        showScreen("ban");
+        if (mqttClient) try { mqttClient.disconnect(); } catch(_) {}
+      }
+    });
+  } else {
+    currentUser = null;
+    showScreen("login");
+  }
+});
+
+function showScreen(name) {
+  regScreen.classList.add("hidden");
+  loginScreen.classList.add("hidden");
+  banScreen.classList.add("hidden");
+  if (name === "register") regScreen.classList.remove("hidden");
+  else if (name === "login") loginScreen.classList.remove("hidden");
+  else if (name === "ban")  banScreen.classList.remove("hidden");
+  // "chat" = all hidden = main UI visible
 }
 
-/* ═══════════ MQTT ═══════════ */
-function connect() {
-  appendSystem("Connecting to server...");
-  client = mqtt.connect(BROKER, { reconnectPeriod: 4000 });
+/* ═══ REGISTER ═══ */
+$("reg-btn").addEventListener("click", async () => {
+  const name  = $("reg-name").value.trim();
+  const email = $("reg-email").value.trim();
+  const pass  = $("reg-pass").value;
+  const err   = $("reg-err");
+  err.textContent = "";
 
-  client.on("connect", () => {
+  if (!name)  { err.textContent = "Enter a username."; return; }
+  if (name.length < 2) { err.textContent = "Name must be at least 2 characters."; return; }
+  if (RESERVED.includes(name.toUpperCase())) { err.textContent = 'Name "' + name + '" is reserved!'; return; }
+  if (!email) { err.textContent = "Enter your email."; return; }
+  if (!pass)  { err.textContent = "Enter a password."; return; }
+
+  $("reg-btn").disabled = true;
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    // Save profile
+    await setDoc(doc(db, "users", cred.user.uid), {
+      username,
+      email,
+      isAdmin:   name === "Artuom-Dev",
+      banned:    false,
+      banReason: "",
+      bannedBy:  "",
+      createdAt: Date.now()
+    });
+  } catch(e) {
+    err.textContent = firebaseErr(e.code);
+    $("reg-btn").disabled = false;
+  }
+});
+
+$("go-login-btn").addEventListener("click", () => { showScreen("login"); });
+$("go-reg-btn").addEventListener("click",   () => { showScreen("register"); });
+
+/* ═══ LOGIN ═══ */
+$("login-btn").addEventListener("click", async () => {
+  const email = $("login-email").value.trim();
+  const pass  = $("login-pass").value;
+  const err   = $("login-err");
+  err.textContent = ""; $("login-ok").textContent = "";
+  if (!email || !pass) { err.textContent = "Fill in all fields."; return; }
+  $("login-btn").disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    err.textContent = firebaseErr(e.code);
+    $("login-btn").disabled = false;
+  }
+});
+
+$("forgot-btn").addEventListener("click", async () => {
+  const email = $("login-email").value.trim();
+  if (!email) { $("login-err").textContent = "Enter your email first."; return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    $("login-ok").textContent = "Reset email sent!";
+    $("login-err").textContent = "";
+  } catch(e) {
+    $("login-err").textContent = firebaseErr(e.code);
+  }
+});
+
+[$("login-pass")].forEach(el => el.addEventListener("keydown", e => { if (e.key === "Enter") $("login-btn").click(); }));
+[$("reg-pass")].forEach(el => el.addEventListener("keydown", e => { if (e.key === "Enter") $("reg-btn").click(); }));
+
+function firebaseErr(code) {
+  const m = {
+    "auth/email-already-in-use":    "Email already registered.",
+    "auth/invalid-email":           "Invalid email address.",
+    "auth/weak-password":           "Password too weak (min 6 chars).",
+    "auth/user-not-found":          "No account with this email.",
+    "auth/wrong-password":          "Wrong password.",
+    "auth/invalid-credential":      "Wrong email or password.",
+    "auth/too-many-requests":       "Too many attempts. Try later.",
+  };
+  return m[code] || "Error: " + code;
+}
+
+/* ═══ MQTT ═══ */
+function initMQTT() {
+  appendSystem("Connecting to server...");
+  mqttClient = mqtt.connect(BROKER, { reconnectPeriod: 4000 });
+  mqttClient.on("connect", () => {
     connected = true;
     dot.classList.add("on");
     statusText.textContent = username + (isAdmin ? " [ADMIN]" : "") + " · Online";
-    client.subscribe(TOPIC);
-    client.publish(TOPIC, "__JOIN__" + username);
-    appendSystem("Connected! Type /help to see commands.");
+    mqttClient.subscribe(TOPIC);
+    mqttClient.publish(TOPIC, "__JOIN__" + username);
+    appendSystem("Connected! Type /help for commands.");
     if (isAdmin) appendLine("admin", "Admin mode active. Welcome, " + username + "!");
     msgInput.disabled = false; sendBtn.disabled = false; msgInput.focus();
   });
-  client.on("message", (_, p) => handleIncoming(p.toString()));
-  client.on("disconnect", () => {
+  mqttClient.on("message", (_, p) => handleIncoming(p.toString()));
+  mqttClient.on("disconnect", () => {
     connected = false; dot.classList.remove("on");
     statusText.textContent = "Disconnected";
     msgInput.disabled = true; sendBtn.disabled = true;
   });
-  client.on("error", err => appendError("MQTT error: " + err.message));
+  mqttClient.on("error", e => appendError("MQTT: " + e.message));
 }
 
-/* ═══════════ INCOMING ═══════════ */
+/* ═══ INCOMING ═══ */
 function handleIncoming(text) {
-  if      (text.startsWith("__JOIN__"))    appendLine("join", "* " + text.slice(8) + " joined the server *");
-  else if (text.startsWith("__LEAVE__"))   appendLine("join", "* " + text.slice(9) + " left the server *");
+  if      (text.startsWith("__JOIN__"))  appendLine("join", "* " + text.slice(8) + " joined *");
+  else if (text.startsWith("__LEAVE__")) appendLine("join", "* " + text.slice(9) + " left *");
   else if (text.startsWith("__MSG__")) {
     const rest = text.slice(7), ci = rest.indexOf(":");
-    if (ci === -1) return;
+    if (ci < 0) return;
     const name = rest.slice(0, ci), body = rest.slice(ci + 1);
-    const ts = new Date().toTimeString().slice(0, 5);
-    const self = name === username;
-    const isChat = name === "CHAT";
-    appendMsg(ts, name, body, self, isChat);
+    appendMsg(new Date().toTimeString().slice(0,5), name, body, name === username, name === "CHAT");
   } else if (text.startsWith("__KICK__")) {
-    const target = text.slice(8);
-    if (target === username) {
-      appendError("You have been kicked from the server!");
-      client.disconnect(); connected = false;
-      dot.classList.remove("on"); statusText.textContent = "Kicked";
-      msgInput.disabled = true; sendBtn.disabled = true;
-    } else appendLine("join", "* " + target + " was kicked *");
+    const t = text.slice(8);
+    if (t === username) {
+      appendError("You were kicked!"); disconnect();
+    } else appendLine("join", "* " + t + " was kicked *");
   } else if (text.startsWith("__ANNOUNCE__")) {
-    const msg = text.slice(12);
-    appendLine("announce", "📢 " + msg);
-    // also show as CHAT message
-    const ts = new Date().toTimeString().slice(0, 5);
-    appendMsg(ts, "CHAT", "📢 " + msg, false, true);
-  } else if (text === "__BADAPPLE__") {
-    startBadApple();
-  } else if (text === "__CRASH__") {
-    triggerCrash();
-  }
+    appendLine("announce", "📢 " + text.slice(12));
+    appendMsg(new Date().toTimeString().slice(0,5), "CHAT", "📢 " + text.slice(12), false, true);
+  } else if (text === "__BADAPPLE__") startBadApple();
+  else if (text === "__CRASH__")     triggerCrash();
 }
 
-/* ═══════════ SEND + SPAM GUARD ═══════════ */
+function disconnect() {
+  connected = false; dot.classList.remove("on"); statusText.textContent = "Disconnected";
+  msgInput.disabled = true; sendBtn.disabled = true;
+  if (mqttClient) try { mqttClient.disconnect(); } catch(_) {}
+}
+
+/* ═══ SEND ═══ */
 function send() {
   const text = msgInput.value.trim();
   if (!text) return;
   msgInput.value = ""; hist.unshift(text); histIdx = -1;
-
   if (text.startsWith("/")) { processCommand(text.slice(1)); return; }
   if (!connected) { appendError("Not connected."); return; }
-
-  // Anti-spam (skip for admin)
   if (!isAdmin) {
     const now = Date.now();
     spamTimes = spamTimes.filter(t => now - t < 2000);
     spamTimes.push(now);
-    if (spamTimes.length > 7) {
-      blockSpam();
-      return;
-    }
+    if (spamTimes.length > 7) { blockSpam(); return; }
   }
-
-  client.publish(TOPIC, "__MSG__" + username + ":" + text);
+  mqttClient.publish(TOPIC, "__MSG__" + username + ":" + text);
 }
 
 function blockSpam() {
   if (spamBlocked) return;
-  spamBlocked = true;
-  msgInput.disabled = true; sendBtn.disabled = true;
+  spamBlocked = true; msgInput.disabled = true; sendBtn.disabled = true;
   spamBar.classList.add("visible");
-  let left = 30;
-  spamCountEl.textContent = left;
+  let left = 30; spamCd.textContent = left;
   spamTimer = setInterval(() => {
-    left--;
-    spamCountEl.textContent = left;
+    left--; spamCd.textContent = left;
     if (left <= 0) {
-      clearInterval(spamTimer);
-      spamBlocked = false;
-      spamTimes = [];
+      clearInterval(spamTimer); spamBlocked = false; spamTimes = [];
       msgInput.disabled = false; sendBtn.disabled = false;
       spamBar.classList.remove("visible");
-      appendLine("system", "Chat unblocked. Slow down next time!");
-      msgInput.focus();
+      appendLine("system", "Chat unblocked."); msgInput.focus();
     }
   }, 1000);
 }
@@ -507,207 +579,214 @@ msgInput.addEventListener("keydown", e => {
   if (e.key === "ArrowDown") { histIdx = Math.max(histIdx-1,-1); msgInput.value = histIdx<0?"":hist[histIdx]; }
 });
 
-/* ═══════════ COMMANDS ═══════════ */
+/* ═══ COMMANDS ═══ */
 function processCommand(raw) {
   const parts = raw.trim().split(/\s+/);
-  const cmd = parts[0].toLowerCase();
-  const args = parts.slice(1);
+  const cmd   = parts[0].toLowerCase();
+  const args  = parts.slice(1);
 
-  switch (cmd) {
+  switch(cmd) {
     case "help":
-      appendLine("help", "+-----------------------------------------+");
-      appendLine("help", "|         AVAILABLE COMMANDS              |");
-      appendLine("help", "+-----------------------------------------+");
-      appendLine("help", "| /help               show this list      |");
-      appendLine("help", "| /quit               disconnect & leave  |");
-      appendLine("help", "| /kick <player>      kick player [ADMIN] |");
-      appendLine("help", "| /BadApple           Bad Apple  [ADMIN]  |");
-      appendLine("help", "| /Crasher            crash srv  [ADMIN]  |");
-      appendLine("help", "| /announce <text>    broadcast  [ADMIN]  |");
-      appendLine("help", "+-----------------------------------------+");
+      appendLine("help", "+------------------------------------------+");
+      appendLine("help", "|          AVAILABLE COMMANDS              |");
+      appendLine("help", "+------------------------------------------+");
+      appendLine("help", "| /help                show this list      |");
+      appendLine("help", "| /quit                disconnect & leave  |");
+      appendLine("help", "| /kick <player>       kick     [ADMIN]    |");
+      appendLine("help", "| /ban <player> [reason]  ban   [ADMIN]    |");
+      appendLine("help", "| /BadApple            Bad Apple [ADMIN]   |");
+      appendLine("help", "| /Crasher             crash    [ADMIN]    |");
+      appendLine("help", "| /announce <text>     broadcast [ADMIN]   |");
+      appendLine("help", "+------------------------------------------+");
       break;
 
     case "quit": case "exit":
-      if (client) client.publish(TOPIC, "__LEAVE__" + username);
-      setTimeout(() => { if (client) client.disconnect(); window.location.reload(); }, 400);
+      if (mqttClient) mqttClient.publish(TOPIC, "__LEAVE__" + username);
+      setTimeout(() => { disconnect(); signOut(auth); }, 400);
       break;
 
     case "kick":
-      if (!isAdmin) { appendError("Permission denied — admin only."); return; }
+      if (!isAdmin) { appendError("Admin only."); return; }
       if (!args[0]) { appendError("Usage: /kick <player>"); return; }
-      client.publish(TOPIC, "__KICK__" + args[0]);
+      mqttClient.publish(TOPIC, "__KICK__" + args[0]);
       appendLine("admin", "Kicked: " + args[0]);
       break;
 
+    case "ban":
+      if (!isAdmin) { appendError("Admin only."); return; }
+      if (!args[0]) { appendError("Usage: /ban <player> [reason]"); return; }
+      banPlayer(args[0], args.slice(1).join(" ") || "Banned by admin");
+      break;
+
     case "badapple":
-      if (!isAdmin) { appendError("Permission denied — admin only."); return; }
-      client.publish(TOPIC, "__BADAPPLE__");
+      if (!isAdmin) { appendError("Admin only."); return; }
+      mqttClient.publish(TOPIC, "__BADAPPLE__");
       break;
 
     case "crasher":
-      if (!isAdmin) { appendError("Permission denied — admin only."); return; }
+      if (!isAdmin) { appendError("Admin only."); return; }
       confirmOvr.classList.add("visible");
       break;
 
     case "announce":
-      if (!isAdmin) { appendError("Permission denied — admin only."); return; }
+      if (!isAdmin) { appendError("Admin only."); return; }
       const msg = args.join(" ").trim();
       if (!msg) { appendError("Usage: /announce <text>"); return; }
-      client.publish(TOPIC, "__ANNOUNCE__" + msg);
+      mqttClient.publish(TOPIC, "__ANNOUNCE__" + msg);
       break;
 
     default:
       appendError("Unknown command: /" + raw.trim());
-      appendLine("system", "Type /help to see available commands.");
+      appendLine("system", "Type /help for commands.");
   }
 }
 
-/* ═══════════ CONFIRM CRASHER ═══════════ */
-confirmYes.addEventListener("click", () => {
-  confirmOvr.classList.remove("visible");
-  client.publish(TOPIC, "__CRASH__");
-});
-confirmNo.addEventListener("click", () => confirmOvr.classList.remove("visible"));
+/* ═══ BAN ═══ */
+async function banPlayer(targetName, reason) {
+  // Find user by username in Firestore
+  appendLine("admin", "Searching for player: " + targetName + "...");
+  try {
+    const { getDocs, collection, query, where } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const q = query(collection(db, "users"), where("username", "==", targetName));
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      appendError("Player not found: " + targetName);
+      return;
+    }
+    snap.forEach(async docSnap => {
+      await setDoc(doc(db, "users", docSnap.id), {
+        ...docSnap.data(),
+        banned:    true,
+        banReason: reason,
+        bannedBy:  username
+      });
+    });
+    mqttClient.publish(TOPIC, "__KICK__" + targetName);
+    appendLine("admin", "Banned: " + targetName + " — " + reason);
+  } catch(e) {
+    appendError("Ban failed: " + e.message);
+  }
+}
 
-/* ═══════════ BAD APPLE ═══════════ */
+/* ═══ CONFIRM CRASHER ═══ */
+$("confirm-yes").addEventListener("click", () => {
+  confirmOvr.classList.remove("visible");
+  mqttClient.publish(TOPIC, "__CRASH__");
+});
+$("confirm-no").addEventListener("click", () => confirmOvr.classList.remove("visible"));
+
+/* ═══ BAD APPLE ═══ */
 function parseTxtFrames(text) {
   const frames = [];
   const parts = text.split(/^--- Frame \d+ ---\s*$/m);
   for (let i = 1; i < parts.length; i++) {
-    const f = parts[i].replace(/^\n/, "").replace(/\n$/, "");
+    const f = parts[i].replace(/^\n/,"").replace(/\n$/,"");
     if (f.trim()) frames.push(f);
   }
   return frames;
 }
 
 async function loadBaFrames() {
-  if (baLoaded || baLoading) return;
-  baLoading = true;
-  baLoading_el_show(true);
+  if (baLoaded || baIsLoading) return;
+  baIsLoading = true;
+  baLoadingEl.style.display = "block";
   baProgFill.style.width = "0%";
   baPre.textContent = "";
-
   try {
     const resp = await fetch(BA_URL);
     if (!resp.ok) throw new Error("HTTP " + resp.status);
-    const total = parseInt(resp.headers.get("content-length") || "0");
+    const total = parseInt(resp.headers.get("content-length")||"0");
     const reader = resp.body.getReader();
     const decoder = new TextDecoder();
     let received = 0, chunks = "";
-
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
       received += value.length;
       chunks += decoder.decode(value, { stream: true });
-      if (total > 0) baProgFill.style.width = Math.min(99, Math.round(received / total * 100)) + "%";
+      if (total > 0) baProgFill.style.width = Math.min(99, Math.round(received/total*100)) + "%";
     }
-
     baFrames = parseTxtFrames(chunks);
     baLoaded = true;
     baProgFill.style.width = "100%";
     baLoadText.textContent = "Loaded " + baFrames.length + " frames!";
-    await new Promise(res => setTimeout(res, 600));
-    baLoading_el_show(false);
-  } catch (e) {
-    baLoadText.textContent = "Load error: " + e.message;
-    baLoading = false;
-    return;
+    await new Promise(r => setTimeout(r, 600));
+    baLoadingEl.style.display = "none";
+  } catch(e) {
+    baLoadText.textContent = "Error: " + e.message;
+    baIsLoading = false; return;
   }
-  baLoading = false;
-}
-
-function baLoading_el_show(on) {
-  baLoading.style.display = on ? "block" : "none";
+  baIsLoading = false;
 }
 
 async function startBadApple() {
   baWrap.classList.add("visible");
   if (!baLoaded) await loadBaFrames();
-  if (!baFrames.length) { baLoadText.textContent = "No frames found!"; return; }
-
+  if (!baFrames.length) { baLoadText.textContent = "No frames!"; return; }
   baCurFrame = 0; baStart = Date.now();
   clearInterval(baInterval);
-
-  // Notify chat
-  const ts = new Date().toTimeString().slice(0, 5);
-  appendMsg(ts, "CHAT", "▶ Bad Apple is now playing! [30 FPS]", false, true);
-
+  appendMsg(new Date().toTimeString().slice(0,5), "CHAT", "▶ Bad Apple playing! [30 FPS]", false, true);
   baInterval = setInterval(() => {
-    if (!baFrames.length) return;
     baPre.textContent = baFrames[baCurFrame % baFrames.length];
     baCurFrame++;
-    const s = Math.floor((Date.now() - baStart) / 1000);
-    baTimer.textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
-  }, 1000 / BA_FPS);
+    const s = Math.floor((Date.now()-baStart)/1000);
+    baTimer.textContent = String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+  }, 1000/BA_FPS);
 }
 
 baStop.addEventListener("click", () => {
   clearInterval(baInterval); baInterval = null;
   baWrap.classList.remove("visible");
-  const ts = new Date().toTimeString().slice(0, 5);
-  appendMsg(ts, "CHAT", "⏹ Bad Apple stopped.", false, true);
+  appendMsg(new Date().toTimeString().slice(0,5), "CHAT", "⏹ Bad Apple stopped.", false, true);
 });
 
-/* ═══════════ CRASH ═══════════ */
+/* ═══ CRASH ═══ */
 function triggerCrash() {
   playCrashSound();
-  try { if (client) client.disconnect(); } catch (_) {}
-  connected = false; dot.classList.remove("on"); statusText.textContent = "CRASHED";
+  disconnect();
   crashOverlay.classList.add("visible");
 }
 function playCrashSound() {
   try {
-    const ac = new (window.AudioContext || window.webkitAudioContext)();
-    const buf = ac.createBuffer(1, ac.sampleRate * 4, ac.sampleRate);
+    const ac = new (window.AudioContext||window.webkitAudioContext)();
+    const buf = ac.createBuffer(1, ac.sampleRate*4, ac.sampleRate);
     const d = buf.getChannelData(0);
-    for (let i = 0; i < d.length; i++)
-      d[i] = (Math.random() * 2 - 1) * (i < ac.sampleRate * .05 ? i / (ac.sampleRate * .05) : 1);
-    const noise = ac.createBufferSource(); noise.buffer = buf;
-    const gain = ac.createGain(); gain.gain.value = 5;
-    const ws = ac.createWaveShaper();
-    const curve = new Float32Array(256);
-    for (let i = 0; i < 256; i++) { const x = (i * 2) / 256 - 1; curve[i] = ((Math.PI + 800) * x) / (Math.PI + 800 * Math.abs(x)); }
-    ws.curve = curve; ws.oversample = "4x";
-    noise.connect(ws); ws.connect(gain); gain.connect(ac.destination);
-    noise.start(); noise.stop(ac.currentTime + 4);
-    const osc = ac.createOscillator(), og = ac.createGain();
-    osc.type = "sawtooth";
-    osc.frequency.setValueAtTime(1400, ac.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(60, ac.currentTime + 3);
-    og.gain.value = 3; osc.connect(og); og.connect(ac.destination);
-    osc.start(); osc.stop(ac.currentTime + 3.5);
-  } catch (e) { console.warn("Audio:", e); }
+    for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(i<ac.sampleRate*.05?i/(ac.sampleRate*.05):1);
+    const noise=ac.createBufferSource(); noise.buffer=buf;
+    const gain=ac.createGain(); gain.gain.value=5;
+    const ws=ac.createWaveShaper();
+    const curve=new Float32Array(256);
+    for(let i=0;i<256;i++){const x=(i*2)/256-1;curve[i]=((Math.PI+800)*x)/(Math.PI+800*Math.abs(x));}
+    ws.curve=curve; ws.oversample="4x";
+    noise.connect(ws);ws.connect(gain);gain.connect(ac.destination);
+    noise.start();noise.stop(ac.currentTime+4);
+    const osc=ac.createOscillator(),og=ac.createGain();
+    osc.type="sawtooth";osc.frequency.setValueAtTime(1400,ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(60,ac.currentTime+3);
+    og.gain.value=3;osc.connect(og);og.connect(ac.destination);
+    osc.start();osc.stop(ac.currentTime+3.5);
+  } catch(e) {}
 }
-$("crash-reload").addEventListener("click", () => window.location.reload());
-window.addEventListener("keydown", () => { if (crashOverlay.classList.contains("visible")) window.location.reload(); });
+$("crash-reload").addEventListener("click", ()=>window.location.reload());
+window.addEventListener("keydown", ()=>{ if(crashOverlay.classList.contains("visible")) window.location.reload(); });
 
-/* ═══════════ RENDER ═══════════ */
+/* ═══ RENDER ═══ */
 function appendMsg(ts, name, body, self, isChat) {
   const d = document.createElement("div");
-  d.className = "line" + (self ? " self" : "") + (isChat ? " chat-name" : "");
-  d.innerHTML =
-    '<span class="ts">[' + ts + ']</span> ' +
-    '<span class="name">&lt;' + esc(name) + '&gt;</span> ' +
-    '<span class="body">' + esc(body) + '</span>';
+  d.className = "line" + (self?" self":"") + (isChat?" chat-msg":"");
+  d.innerHTML = '<span class="ts">['+ts+']</span> <span class="name">&lt;'+esc(name)+'&gt;</span> <span class="body">'+esc(body)+'</span>';
   push(d);
 }
-function appendLine(cls, text) {
-  const d = document.createElement("div");
-  d.className = "line " + cls;
-  d.textContent = text;
-  push(d);
-}
-function appendSystem(t) { appendLine("system", t); }
-function appendError(t)  { appendLine("error", t); }
-function push(el) { chatEl.appendChild(el); chatEl.scrollTop = chatEl.scrollHeight; }
-function esc(s) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
+function appendLine(cls, text) { const d=document.createElement("div"); d.className="line "+cls; d.textContent=text; push(d); }
+function appendSystem(t) { appendLine("system",t); }
+function appendError(t)  { appendLine("error",t); }
+function push(el) { chatEl.appendChild(el); chatEl.scrollTop=chatEl.scrollHeight; }
+function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-window.addEventListener("beforeunload", () => {
-  try { if (client && username) client.publish(TOPIC, "__LEAVE__" + username); } catch (_) {}
+window.addEventListener("beforeunload", ()=>{
+  try { if(mqttClient&&username) mqttClient.publish(TOPIC,"__LEAVE__"+username); } catch(_){}
 });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.5.0/mqtt.min.js"></script>
 </body>
 </html>
