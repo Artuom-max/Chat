@@ -113,6 +113,8 @@
       flex-shrink: 0;
     }
     .title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--green); }
+    .player-count { color: var(--green-mid); font-size: 13px; letter-spacing: 1px; }
+    .player-count span { color: var(--green); font-weight: bold; }
     .hdr-right { display: flex; align-items: center; gap: 12px; }
     .user-badge { color: var(--gold); font-size: 14px; }
     .status { display: flex; align-items: center; gap: 6px; }
@@ -265,7 +267,10 @@
 
 <!-- ── MAIN UI ── -->
 <header>
-  <div class="title">🟩 GLOBAL CHAT</div>
+  <div class="hdr-left" style="display:flex;align-items:center;gap:14px">
+    <div class="title">🟩 GLOBAL CHAT</div>
+    <div class="player-count">👥 <span id="player-count">0</span> online</div>
+  </div>
   <div class="hdr-right">
     <span class="user-badge" id="user-badge"></span>
     <div class="status">
@@ -303,8 +308,10 @@ import { initializeApp }                         from "https://www.gstatic.com/f
 import { getAuth, createUserWithEmailAndPassword,
          signInWithEmailAndPassword, onAuthStateChanged,
          sendPasswordResetEmail, signOut }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc,
-         onSnapshot }                             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot,
+         collection, addDoc, getDocs, query, orderBy,
+         limit, serverTimestamp, deleteDoc, writeBatch,
+         where }                                  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* ═══ FIREBASE INIT ═══ */
 const app = initializeApp({
@@ -333,6 +340,7 @@ let hist = [], histIdx = -1;
 let spamTimes = [], spamBlocked = false, spamTimer = null;
 let baFrames = [], baLoaded = false, baIsLoading = false;
 let baInterval = null, baCurFrame = 0, baStart = 0;
+let presenceInterval = null, playerCountInterval = null;
 
 /* ═══ DOM ═══ */
 const $ = id => document.getElementById(id);
@@ -356,6 +364,7 @@ const statusText   = $("status-text");
 const userBadge    = $("user-badge");
 const spamBar      = $("spam-bar");
 const spamCd       = $("spam-cd");
+const playerCountEl= $("player-count");
 
 /* ═══ AUTH STATE ═══ */
 onAuthStateChanged(auth, async user => {
@@ -429,7 +438,7 @@ $("reg-btn").addEventListener("click", async () => {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     // Save profile
     await setDoc(doc(db, "users", cred.user.uid), {
-      username,
+      username:  name,
       email,
       isAdmin:   name === "Artuom-Dev",
       banned:    false,
@@ -502,7 +511,10 @@ function initMQTT() {
     mqttClient.publish(TOPIC, "__JOIN__" + username);
     appendSystem("Connected! Type /help for commands.");
     if (isAdmin) appendLine("admin", "Admin mode active. Welcome, " + username + "!");
-    msgInput.disabled = false; sendBtn.disabled = false; msgInput.focus();
+    msgInput.disabled = false; sendBtn.disabled = false;
+    loadChatHistory();
+    startPresence();
+    msgInput.focus();
   });
   mqttClient.on("message", (_, p) => handleIncoming(p.toString()));
   mqttClient.on("disconnect", () => {
@@ -522,6 +534,7 @@ function handleIncoming(text) {
     if (ci < 0) return;
     const name = rest.slice(0, ci), body = rest.slice(ci + 1);
     appendMsg(new Date().toTimeString().slice(0,5), name, body, name === username, name === "CHAT");
+    saveMessageToHistory(name, body);
   } else if (text.startsWith("__KICK__")) {
     const t = text.slice(8);
     if (t === username) {
@@ -532,11 +545,16 @@ function handleIncoming(text) {
     appendMsg(new Date().toTimeString().slice(0,5), "CHAT", "📢 " + text.slice(12), false, true);
   } else if (text === "__BADAPPLE__") startBadApple();
   else if (text === "__CRASH__")     triggerCrash();
+  else if (text.startsWith("__CLEARH__")) {
+    const secs = parseInt(text.slice(10)) || 3;
+    startClearCountdown(secs);
+  }
 }
 
 function disconnect() {
   connected = false; dot.classList.remove("on"); statusText.textContent = "Disconnected";
   msgInput.disabled = true; sendBtn.disabled = true;
+  stopPresence();
   if (mqttClient) try { mqttClient.disconnect(); } catch(_) {}
 }
 
@@ -594,6 +612,7 @@ function processCommand(raw) {
       appendLine("help", "| /quit                disconnect & leave  |");
       appendLine("help", "| /kick <player>       kick     [ADMIN]    |");
       appendLine("help", "| /ban <player> [reason]  ban   [ADMIN]    |");
+      appendLine("help", "| /ClearH              clear chat [ADMIN]  |");
       appendLine("help", "| /BadApple            Bad Apple [ADMIN]   |");
       appendLine("help", "| /Crasher             crash    [ADMIN]    |");
       appendLine("help", "| /announce <text>     broadcast [ADMIN]   |");
@@ -628,6 +647,11 @@ function processCommand(raw) {
       confirmOvr.classList.add("visible");
       break;
 
+    case "clearh":
+      if (!isAdmin) { appendError("Admin only."); return; }
+      mqttClient.publish(TOPIC, "__CLEARH__3");
+      break;
+
     case "announce":
       if (!isAdmin) { appendError("Admin only."); return; }
       const msg = args.join(" ").trim();
@@ -643,10 +667,8 @@ function processCommand(raw) {
 
 /* ═══ BAN ═══ */
 async function banPlayer(targetName, reason) {
-  // Find user by username in Firestore
-  appendLine("admin", "Searching for player: " + targetName + "...");
+  appendLine("admin", "Searching for: " + targetName + "...");
   try {
-    const { getDocs, collection, query, where } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
     const q = query(collection(db, "users"), where("username", "==", targetName));
     const snap = await getDocs(q);
     if (snap.empty) {
@@ -740,6 +762,105 @@ baStop.addEventListener("click", () => {
   appendMsg(new Date().toTimeString().slice(0,5), "CHAT", "⏹ Bad Apple stopped.", false, true);
 });
 
+/* ═══ CHAT HISTORY — SAVE & LOAD ═══ */
+const HISTORY_LIMIT = 100; // last 100 messages stored
+
+async function saveMessageToHistory(name, body) {
+  try {
+    await addDoc(collection(db, "chatHistory"), {
+      name, body, ts: serverTimestamp(), at: Date.now()
+    });
+  } catch(e) { console.warn("Save msg:", e); }
+}
+
+async function loadChatHistory() {
+  try {
+    appendSystem("Loading chat history...");
+    const q = query(collection(db, "chatHistory"), orderBy("at", "desc"), limit(HISTORY_LIMIT));
+    const snap = await getDocs(q);
+    const msgs = [];
+    snap.forEach(d => msgs.unshift(d.data()));
+    if (msgs.length === 0) { appendSystem("No previous messages."); return; }
+    appendLine("system", "── " + msgs.length + " previous messages ──");
+    msgs.forEach(m => {
+      const ts = m.at ? new Date(m.at).toTimeString().slice(0,5) : "??:??";
+      appendMsg(ts, m.name, m.body, m.name === username, m.name === "CHAT");
+    });
+    appendLine("system", "── live messages start here ──");
+  } catch(e) { appendSystem("Could not load history: " + e.message); }
+}
+
+async function clearChatHistory() {
+  try {
+    const snap = await getDocs(collection(db, "chatHistory"));
+    const batch = writeBatch(db);
+    snap.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+  } catch(e) { console.warn("Clear history:", e); }
+}
+
+/* ═══ /CLEARH COUNTDOWN ═══ */
+function startClearCountdown(secs) {
+  let left = secs;
+  appendLine("admin", "⚠ Chat will be cleared in " + left + " seconds...");
+  const iv = setInterval(() => {
+    left--;
+    if (left > 0) {
+      appendLine("admin", "⚠ Clearing in " + left + "...");
+    } else {
+      clearInterval(iv);
+      chatEl.innerHTML = "";
+      appendLine("admin", "✓ Chat cleared by " + (isAdmin ? username : "admin") + ".");
+      clearChatHistory();
+    }
+  }, 1000);
+}
+
+/* ═══ PRESENCE — online player count ═══ */
+// Each online user writes their timestamp to presence/{uid} every 2s.
+// Anyone inactive for >6s is considered offline.
+const PRESENCE_TTL = 6000;
+
+async function pingPresence() {
+  if (!currentUser) return;
+  try {
+    await setDoc(doc(db, "presence", currentUser.uid), {
+      username, at: Date.now()
+    });
+  } catch(e) {}
+}
+
+async function fetchPlayerCount() {
+  try {
+    const snap = await getDocs(collection(db, "presence"));
+    const cutoff = Date.now() - PRESENCE_TTL;
+    let count = 0;
+    snap.forEach(d => { if (d.data().at > cutoff) count++; });
+    playerCountEl.textContent = count;
+  } catch(e) {}
+}
+
+async function removePresence() {
+  if (!currentUser) return;
+  try { await deleteDoc(doc(db, "presence", currentUser.uid)); } catch(e) {}
+}
+
+function startPresence() {
+  stopPresence();
+  pingPresence();
+  fetchPlayerCount();
+  presenceInterval   = setInterval(pingPresence,    2000);
+  playerCountInterval = setInterval(fetchPlayerCount, 2000);
+}
+
+function stopPresence() {
+  clearInterval(presenceInterval);
+  clearInterval(playerCountInterval);
+  presenceInterval = null; playerCountInterval = null;
+  removePresence();
+  playerCountEl.textContent = "0";
+}
+
 /* ═══ CRASH ═══ */
 function triggerCrash() {
   playCrashSound();
@@ -785,6 +906,7 @@ function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>
 
 window.addEventListener("beforeunload", ()=>{
   try { if(mqttClient&&username) mqttClient.publish(TOPIC,"__LEAVE__"+username); } catch(_){}
+  removePresence();
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.5.0/mqtt.min.js"></script>
